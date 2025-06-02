@@ -7,11 +7,11 @@
 
 ARG DOCKER_CMAKE_BUILD_TYPE=Release
 ARG CGAL_GIT_BRANCH=master
-FROM postgres:16-bullseye as builder
+FROM postgres:16-bullseye AS builder
 
 LABEL maintainer="PostGIS Project - https://postgis.net" \
-      org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16 bullseye" \
-      org.opencontainers.image.source="https://github.com/postgis/docker-postgis"
+    org.opencontainers.image.description="PostGIS - master  spatial database extension with PostgreSQL 16 bullseye" \
+    org.opencontainers.image.source="https://github.com/curt/docker-postgis"
 
 WORKDIR /
 
@@ -19,66 +19,66 @@ WORKDIR /
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-      curl \
-      libboost-atomic1.74.0 \
-      libboost-chrono1.74.0 \
-      libboost-date-time1.74.0 \
-      libboost-filesystem1.74.0 \
-      libboost-program-options1.74.0 \
-      libboost-serialization1.74.0 \
-      libboost-system1.74.0 \
-      libboost-test1.74.0 \
-      libboost-thread1.74.0 \
-      libboost-timer1.74.0 \
-      libcurl3-gnutls \
-      libexpat1 \
-      libgmp10 \
-      libgmpxx4ldbl \
-      libjson-c5 \
-      libmpfr6 \
-      libprotobuf-c1 \
-      libtiff5 \
-      libxml2 \
-      sqlite3 \
-      # build dependency
-      autoconf \
-      automake \
-      autotools-dev \
-      bison \
-      build-essential \
-      ca-certificates \
-      cmake \
-      g++ \
-      git \
-      libboost-all-dev \
-      libcurl4-gnutls-dev \
-      libgmp-dev \
-      libjson-c-dev \
-      libmpfr-dev \
-      libpcre3-dev \
-      libpq-dev \
-      libprotobuf-c-dev \
-      libsqlite3-dev \
-      libtiff-dev \
-      libtool \
-      libxml2-dev \
-      make \
-      pkg-config \
-      protobuf-c-compiler \
-      xsltproc \
-      # gdal+
-      libblosc-dev \
-      libcfitsio-dev \
-      libfreexl-dev \
-      libfyba-dev \
-      libhdf5-dev \
-      libkml-dev \
-      liblz4-dev \
-      liblzma-dev \
-      libopenjp2-7-dev \
-      libqhull-dev \
-      libwebp-dev \
-      libzstd-dev
+    curl \
+    libboost-atomic1.74.0 \
+    libboost-chrono1.74.0 \
+    libboost-date-time1.74.0 \
+    libboost-filesystem1.74.0 \
+    libboost-program-options1.74.0 \
+    libboost-serialization1.74.0 \
+    libboost-system1.74.0 \
+    libboost-test1.74.0 \
+    libboost-thread1.74.0 \
+    libboost-timer1.74.0 \
+    libcurl3-gnutls \
+    libexpat1 \
+    libgmp10 \
+    libgmpxx4ldbl \
+    libjson-c5 \
+    libmpfr6 \
+    libprotobuf-c1 \
+    libtiff5 \
+    libxml2 \
+    sqlite3 \
+    # build dependency
+    autoconf \
+    automake \
+    autotools-dev \
+    bison \
+    build-essential \
+    ca-certificates \
+    cmake \
+    g++ \
+    git \
+    libboost-all-dev \
+    libcurl4-gnutls-dev \
+    libgmp-dev \
+    libjson-c-dev \
+    libmpfr-dev \
+    libpcre3-dev \
+    libpq-dev \
+    libprotobuf-c-dev \
+    libsqlite3-dev \
+    libtiff-dev \
+    libtool \
+    libxml2-dev \
+    make \
+    pkg-config \
+    protobuf-c-compiler \
+    xsltproc \
+    # gdal+
+    libblosc-dev \
+    libcfitsio-dev \
+    libfreexl-dev \
+    libfyba-dev \
+    libhdf5-dev \
+    libkml-dev \
+    liblz4-dev \
+    liblzma-dev \
+    libopenjp2-7-dev \
+    libqhull-dev \
+    libwebp-dev \
+    libzstd-dev
 
 ARG DOCKER_CMAKE_BUILD_TYPE
 ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
@@ -86,8 +86,8 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 # cgal & sfcgal
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH 3610121c03353a9db28d1823685e0331fa0eb01e
-ENV SFCGAL_GIT_HASH 908fc727b3cd9c59a9a950e462b8f2cc7f50cbe2
+ENV CGAL_GIT_HASH 8a25dea52df4a5f707a7f395e670fee7e1a78db7
+ENV SFCGAL_GIT_HASH 75b69839a8022a33ef12fb6d9259582ece16af7b
 RUN set -ex \
     && mkdir -p /usr/src \
     && cd /usr/src \
@@ -103,12 +103,12 @@ RUN set -ex \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake .. \
-       -DCGAL_DIR=/usr/src/cgal \
-       -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} \
-       -DSFCGAL_BUILD_BENCH=OFF \
-       -DSFCGAL_BUILD_EXAMPLES=OFF \
-       -DSFCGAL_BUILD_TESTS=OFF \
-       -DSFCGAL_WITH_OSG=OFF \
+    -DCGAL_DIR=/usr/src/cgal \
+    -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} \
+    -DSFCGAL_BUILD_BENCH=OFF \
+    -DSFCGAL_BUILD_EXAMPLES=OFF \
+    -DSFCGAL_BUILD_TESTS=OFF \
+    -DSFCGAL_WITH_OSG=OFF \
     && make -j$(nproc) \
     && make install \
     #
@@ -120,7 +120,7 @@ RUN set -ex \
     && rm -fr /usr/src/cgal
 
 # proj
-ENV PROJ_GIT_HASH b2eda4380ba433ca0702131b026309246ee5b5a5
+ENV PROJ_GIT_HASH aed85443934e2b7920a95547f654a44c839a7627
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/PROJ.git \
@@ -129,28 +129,28 @@ RUN set -ex \
     && git log -1 > /_pgis_proj_last_commit.txt \
     # check the autotools exist? https://github.com/OSGeo/PROJ/pull/3027
     && if [ -f "autogen.sh" ] ; then \
-        set -eux \
-        && echo "autotools version: 'autogen.sh' exists! Older version!"  \
-        && ./autogen.sh \
-        && ./configure --disable-static \
-        && make -j$(nproc) \
-        && make install \
-        ; \
+    set -eux \
+    && echo "autotools version: 'autogen.sh' exists! Older version!"  \
+    && ./autogen.sh \
+    && ./configure --disable-static \
+    && make -j$(nproc) \
+    && make install \
+    ; \
     else \
-        set -eux \
-        && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
-        && mkdir build \
-        && cd build \
-        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
-        && make -j$(nproc) \
-        && make install \
-        ; \
+    set -eux \
+    && echo "cmake version: 'autogen.sh' does not exists! Newer version!" \
+    && mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+    && make -j$(nproc) \
+    && make install \
+    ; \
     fi \
     \
     && rm -fr /usr/src/PROJ
 
 # geos
-ENV GEOS_GIT_HASH 31399d845873fa03caee5141f7c355cbd0660c83
+ENV GEOS_GIT_HASH b577e3056f5a3ecec7bb1ded2181591a87b06149
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/libgeos/geos.git \
@@ -166,7 +166,7 @@ RUN set -ex \
     && rm -fr /usr/src/geos
 
 # gdal
-ENV GDAL_GIT_HASH 2f9b255b4c3e200435900c7605a8d42cc59f5f1d
+ENV GDAL_GIT_HASH b6dddfdf273d00aef6bfe08f5e2d6791cd5ac471
 RUN set -ex \
     && cd /usr/src \
     && git clone https://github.com/OSGeo/gdal.git \
@@ -176,58 +176,58 @@ RUN set -ex \
     \
     # gdal project directory structure - has been changed !
     && if [ -d "gdal" ] ; then \
-        echo "Directory 'gdal' dir exists -> older version!" ; \
-        cd gdal ; \
+    echo "Directory 'gdal' dir exists -> older version!" ; \
+    cd gdal ; \
     else \
-        echo "Directory 'gdal' does not exists! Newer version! " ; \
+    echo "Directory 'gdal' does not exists! Newer version! " ; \
     fi \
     \
     && if [ -f "./autogen.sh" ]; then \
-        # Building with autoconf ( old/deprecated )
-        set -eux \
-        && ./autogen.sh \
-        && ./configure --disable-static \
-        ; \
+    # Building with autoconf ( old/deprecated )
+    set -eux \
+    && ./autogen.sh \
+    && ./configure --disable-static \
+    ; \
     else \
-        # Building with cmake
-        set -eux \
-        && mkdir build \
-        && cd build \
-        # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
-        && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
-            -DBUILD_DOCS=OFF \
-            \
-            -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
-            -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
-            -DGDAL_USE_BLOSC=ON \
-            -DGDAL_USE_CFITSIO=ON \
-            -DGDAL_USE_CURL=ON \
-            -DGDAL_USE_DEFLATE=ON \
-            -DGDAL_USE_EXPAT=ON \
-            -DGDAL_USE_FREEXL=ON \
-            -DGDAL_USE_FYBA=ON \
-            -DGDAL_USE_GEOS=ON \
-            -DGDAL_USE_HDF5=ON \
-            -DGDAL_USE_JSONC=ON \
-            -DGDAL_USE_LERC_INTERNAL=ON \
-            -DGDAL_USE_LIBKML=ON \
-            -DGDAL_USE_LIBLZMA=ON \
-            -DGDAL_USE_LZ4=ON \
-            -DGDAL_USE_OPENJPEG=ON \
-            -DGDAL_USE_POSTGRESQL=ON \
-            -DGDAL_USE_QHULL=ON \
-            -DGDAL_USE_SQLITE3=ON \
-            -DGDAL_USE_TIFF=ON \
-            -DGDAL_USE_WEBP=ON \
-            -DGDAL_USE_ZSTD=ON \
-            \
-            # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
-            # -DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
-            -DGDAL_USE_ECW=OFF \
-            -DGDAL_USE_GEOTIFF=OFF \
-            -DGDAL_USE_HEIF=OFF \
-            -DGDAL_USE_SPATIALITE=OFF \
-        ; \
+    # Building with cmake
+    set -eux \
+    && mkdir build \
+    && cd build \
+    # config based on: https://salsa.debian.org/debian-gis-team/gdal/-/blob/master/debian/rules
+    && cmake .. -DCMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE} -DBUILD_TESTING=OFF \
+    -DBUILD_DOCS=OFF \
+    \
+    -DGDAL_HIDE_INTERNAL_SYMBOLS=ON \
+    -DRENAME_INTERNAL_TIFF_SYMBOLS=ON \
+    -DGDAL_USE_BLOSC=ON \
+    -DGDAL_USE_CFITSIO=ON \
+    -DGDAL_USE_CURL=ON \
+    -DGDAL_USE_DEFLATE=ON \
+    -DGDAL_USE_EXPAT=ON \
+    -DGDAL_USE_FREEXL=ON \
+    -DGDAL_USE_FYBA=ON \
+    -DGDAL_USE_GEOS=ON \
+    -DGDAL_USE_HDF5=ON \
+    -DGDAL_USE_JSONC=ON \
+    -DGDAL_USE_LERC_INTERNAL=ON \
+    -DGDAL_USE_LIBKML=ON \
+    -DGDAL_USE_LIBLZMA=ON \
+    -DGDAL_USE_LZ4=ON \
+    -DGDAL_USE_OPENJPEG=ON \
+    -DGDAL_USE_POSTGRESQL=ON \
+    -DGDAL_USE_QHULL=ON \
+    -DGDAL_USE_SQLITE3=ON \
+    -DGDAL_USE_TIFF=ON \
+    -DGDAL_USE_WEBP=ON \
+    -DGDAL_USE_ZSTD=ON \
+    \
+    # OFF and Not working https://github.com/OSGeo/gdal/issues/7100
+    # -DRENAME_INTERNAL_GEOTIFF_SYMBOLS=ON \
+    -DGDAL_USE_ECW=OFF \
+    -DGDAL_USE_GEOTIFF=OFF \
+    -DGDAL_USE_HEIF=OFF \
+    -DGDAL_USE_SPATIALITE=OFF \
+    ; \
     fi \
     \
     && make -j$(nproc) \
@@ -258,39 +258,39 @@ ENV DOCKER_CMAKE_BUILD_TYPE=${DOCKER_CMAKE_BUILD_TYPE}
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-      curl \
-      libboost-atomic1.74.0 \
-      libboost-chrono1.74.0 \
-      libboost-date-time1.74.0 \
-      libboost-filesystem1.74.0 \
-      libboost-program-options1.74.0 \
-      libboost-serialization1.74.0 \
-      libboost-system1.74.0 \
-      libboost-test1.74.0 \
-      libboost-thread1.74.0 \
-      libboost-timer1.74.0 \
-      libcurl3-gnutls \
-      libexpat1 \
-      libgmp10 \
-      libgmpxx4ldbl \
-      libjson-c5 \
-      libmpfr6 \
-      libpcre3 \
-      libprotobuf-c1 \
-      libtiff5 \
-      libxml2 \
-      sqlite3 \
-      # gdal+
-      libblosc1 \
-      libcfitsio9 \
-      libfreexl1 \
-      libfyba0 \
-      libhdf5-103-1 \
-      libkmlbase1 \
-      libkmldom1 \
-      libkmlengine1 \
-      libopenjp2-7 \
-      libqhull-r8.0 \
+    curl \
+    libboost-atomic1.74.0 \
+    libboost-chrono1.74.0 \
+    libboost-date-time1.74.0 \
+    libboost-filesystem1.74.0 \
+    libboost-program-options1.74.0 \
+    libboost-serialization1.74.0 \
+    libboost-system1.74.0 \
+    libboost-test1.74.0 \
+    libboost-thread1.74.0 \
+    libboost-timer1.74.0 \
+    libcurl3-gnutls \
+    libexpat1 \
+    libgmp10 \
+    libgmpxx4ldbl \
+    libjson-c5 \
+    libmpfr6 \
+    libpcre3 \
+    libprotobuf-c1 \
+    libtiff5 \
+    libxml2 \
+    sqlite3 \
+    # gdal+
+    libblosc1 \
+    libcfitsio9 \
+    libfreexl1 \
+    libfyba0 \
+    libhdf5-103-1 \
+    libkmlbase1 \
+    libkmldom1 \
+    libkmlengine1 \
+    libopenjp2-7 \
+    libqhull-r8.0 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -299,11 +299,11 @@ COPY --from=builder /usr/local /usr/local
 
 ARG CGAL_GIT_BRANCH
 ENV CGAL_GIT_BRANCH=${CGAL_GIT_BRANCH}
-ENV CGAL_GIT_HASH 3610121c03353a9db28d1823685e0331fa0eb01e
-ENV SFCGAL_GIT_HASH 908fc727b3cd9c59a9a950e462b8f2cc7f50cbe2
-ENV PROJ_GIT_HASH b2eda4380ba433ca0702131b026309246ee5b5a5
-ENV GEOS_GIT_HASH 31399d845873fa03caee5141f7c355cbd0660c83
-ENV GDAL_GIT_HASH 2f9b255b4c3e200435900c7605a8d42cc59f5f1d
+ENV CGAL_GIT_HASH 8a25dea52df4a5f707a7f395e670fee7e1a78db7
+ENV SFCGAL_GIT_HASH 75b69839a8022a33ef12fb6d9259582ece16af7b
+ENV PROJ_GIT_HASH aed85443934e2b7920a95547f654a44c839a7627
+ENV GEOS_GIT_HASH b577e3056f5a3ecec7bb1ded2181591a87b06149
+ENV GDAL_GIT_HASH b6dddfdf273d00aef6bfe08f5e2d6791cd5ac471
 
 # Minimal command line test ( fail fast )
 RUN set -ex \
@@ -319,43 +319,43 @@ RUN set -ex \
     \
     # Testing ogr2ogr PostgreSQL driver.
     && ogr2ogr --formats | grep -q "PostgreSQL/PostGIS" && exit 0 \
-            || echo "ogr2ogr missing PostgreSQL driver" && exit 1
+    || echo "ogr2ogr missing PostgreSQL driver" && exit 1
 
 # install postgis
-ENV POSTGIS_GIT_HASH 81e2bc783b77cc740291445e992658e1db7179e0
+ENV POSTGIS_GIT_HASH 7829205c550b4235fdfe9b44775e72b121b34aa8
 
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-      autoconf \
-      automake \
-      autotools-dev \
-      bison \
-      build-essential \
-      ca-certificates \
-      cmake \
-      docbook-xml \
-      docbook5-xml \
-      g++ \
-      git \
-      libboost-all-dev \
-      libcunit1-dev \
-      libcurl4-gnutls-dev \
-      libgmp-dev \
-      libjson-c-dev \
-      libmpfr-dev \
-      libpcre3-dev \
-      libprotobuf-c-dev \
-      libsqlite3-dev \
-      libtiff-dev \
-      libtool \
-      libxml2-dev \
-      libxml2-utils \
-      make \
-      pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
-      protobuf-c-compiler \
-      xsltproc \
+    autoconf \
+    automake \
+    autotools-dev \
+    bison \
+    build-essential \
+    ca-certificates \
+    cmake \
+    docbook-xml \
+    docbook5-xml \
+    g++ \
+    git \
+    libboost-all-dev \
+    libcunit1-dev \
+    libcurl4-gnutls-dev \
+    libgmp-dev \
+    libjson-c-dev \
+    libmpfr-dev \
+    libpcre3-dev \
+    libprotobuf-c-dev \
+    libsqlite3-dev \
+    libtiff-dev \
+    libtool \
+    libxml2-dev \
+    libxml2-utils \
+    make \
+    pkg-config \
+    postgresql-server-dev-$PG_MAJOR \
+    protobuf-c-compiler \
+    xsltproc \
     && cd \
     # postgis
     && cd /usr/src/ \
@@ -364,18 +364,18 @@ RUN set -ex \
     && git checkout ${POSTGIS_GIT_HASH} \
     && git log -1 > /_pgis_last_commit.txt \
     && ./autogen.sh \
-# configure options taken from:
-# https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
+    # configure options taken from:
+    # https://anonscm.debian.org/cgit/pkg-grass/postgis.git/tree/debian/rules?h=jessie
     && ./configure \
-        --enable-lto \
+    --enable-lto \
     && make -j$(nproc) \
     && make install \
-# refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
+    # refresh proj data - workarounds: https://trac.osgeo.org/postgis/ticket/5316
     && projsync --system-directory --file ch_swisstopo_CHENyx06_ETRS \
     && projsync --system-directory --file us_noaa_eshpgn \
     && projsync --system-directory --file us_noaa_prvi \
     && projsync --system-directory --file us_noaa_wmhpgn \
-# regress check
+    # regress check
     && mkdir /tempdb \
     && chown -R postgres:postgres /tempdb \
     && su postgres -c 'pg_ctl -D /tempdb init' \
@@ -400,37 +400,37 @@ RUN set -ex \
     && rm -rf /tempdb \
     && rm -rf /tmp/logfile \
     && rm -rf /tmp/pgis_reg \
-# clean
+    # clean
     && cd / \
     && rm -rf /usr/src/postgis \
     && apt-get purge -y --autoremove \
-      autoconf \
-      automake \
-      autotools-dev \
-      bison \
-      build-essential \
-      cmake \
-      docbook-xml \
-      docbook5-xml \
-      g++ \
-      git \
-      libboost-all-dev \
-      libcurl4-gnutls-dev \
-      libgmp-dev \
-      libjson-c-dev \
-      libmpfr-dev \
-      libpcre3-dev \
-      libprotobuf-c-dev \
-      libsqlite3-dev \
-      libtiff-dev \
-      libtool \
-      libxml2-dev \
-      libxml2-utils \
-      make \
-      pkg-config \
-      postgresql-server-dev-$PG_MAJOR \
-      protobuf-c-compiler \
-      xsltproc \
+    autoconf \
+    automake \
+    autotools-dev \
+    bison \
+    build-essential \
+    cmake \
+    docbook-xml \
+    docbook5-xml \
+    g++ \
+    git \
+    libboost-all-dev \
+    libcurl4-gnutls-dev \
+    libgmp-dev \
+    libjson-c-dev \
+    libmpfr-dev \
+    libpcre3-dev \
+    libprotobuf-c-dev \
+    libsqlite3-dev \
+    libtiff-dev \
+    libtool \
+    libxml2-dev \
+    libxml2-utils \
+    make \
+    pkg-config \
+    postgresql-server-dev-$PG_MAJOR \
+    protobuf-c-compiler \
+    xsltproc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
