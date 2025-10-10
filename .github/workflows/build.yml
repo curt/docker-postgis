@@ -1,22 +1,9 @@
 name: PostGIS (multi-version, multi-arch)
 
 on:
-  workflow_dispatch:
-    inputs:
-      versions_json:
-        description: '["16-3.5","17-3.5","17-3.6"]'
-        default: '["17-3.6"]'
-        required: true
-      flavors_json:
-        description: '["alpine"] or ["alpine","debian"]'
-        default: '["alpine"]'
-        required: true
-      arches_json:
-        description: '["amd64","arm64"]'
-        default: '["amd64","arm64"]'
-        required: true
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,9 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJSON(inputs.versions_json) }}
-        flavor: ${{ fromJSON(inputs.flavors_json) }}
-        arch: ${{ fromJSON(inputs.arches_json) }}
+        version: ${{ fromJSON(vars.MATRIX_JSON).versions }}
+        flavor: ${{ fromJSON(vars.MATRIX_JSON).flavors }}
+        arch: ${{ fromJSON(vars.MATRIX_JSON).arches }}
         include:
           - arch: amd64
             runner: ubuntu-24.04
@@ -57,7 +44,6 @@ jobs:
       - name: Compute paths and tags
         id: x
         run: |
-          # Map flavor to upstream folder suffix and tag suffix
           case "${{ matrix.flavor }}" in
             alpine) FLAVOR_SUBDIR="/alpine"; FLAVOR_TAG="-alpine" ;;
             debian) FLAVOR_SUBDIR="";        FLAVOR_TAG="-debian" ;;
@@ -68,7 +54,7 @@ jobs:
           IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           ARCH_TAG="${IMAGE}:${{ matrix.version }}${FLAVOR_TAG}-${{ matrix.arch }}"
 
-          echo "context_folder=$CTX"   >> $GITHUB_OUTPUT
+          echo "context_folder=$CTX"    >> $GITHUB_OUTPUT
           echo "flavor_tag=$FLAVOR_TAG" >> $GITHUB_OUTPUT
           echo "arch_tag=$ARCH_TAG"     >> $GITHUB_OUTPUT
 
@@ -88,8 +74,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJSON(inputs.versions_json) }}
-        flavor: ${{ fromJSON(inputs.flavors_json) }}
+        version: ${{ fromJSON(vars.MATRIX_JSON).versions }}
+        flavor: ${{ fromJSON(vars.MATRIX_JSON).flavors }}
 
     steps:
       - name: Login to GHCR
@@ -111,9 +97,9 @@ jobs:
           IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           BASE="${IMAGE}:${{ matrix.version }}${FLAVOR_TAG}"
 
-          echo "base=$BASE"  >> $GITHUB_OUTPUT
-          echo "amd64=${BASE}-amd64" >> $GITHUB_OUTPUT
-          echo "arm64=${BASE}-arm64" >> $GITHUB_OUTPUT
+          echo "base=$BASE"              >> $GITHUB_OUTPUT
+          echo "amd64=${BASE}-amd64"     >> $GITHUB_OUTPUT
+          echo "arm64=${BASE}-arm64"     >> $GITHUB_OUTPUT
 
       - name: Create & push multi-arch manifest
         run: |
