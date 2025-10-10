@@ -1,0 +1,112 @@
+name: PostGIS (multi-version, multi-arch)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/postgis
+  UPSTREAM_REPO: https://github.com/postgis/docker-postgis.git
+  UPSTREAM_REF: master
+
+  # Single source of truth (edit here only)
+  VERSIONS_JSON: '["17-3.6"]'
+  FLAVORS_JSON: '["alpine"]' # add "debian" to build both
+  ARCHES_JSON: '["amd64","arm64"]'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJSON(env.VERSIONS_JSON) }}
+        flavor: ${{ fromJSON(env.FLAVORS_JSON) }}
+        arch: ${{ fromJSON(env.ARCHES_JSON) }}
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute paths and tags
+        id: x
+        run: |
+          # context folder: e.g. "17-3.5" or "17-3.5/alpine"
+          FLAVOR_SUBDIR="${{ matrix.flavor == 'alpine' && '/alpine' || '' }}"
+          CTX="${{ matrix.version }}${FLAVOR_SUBDIR}"
+
+          # tag suffix: e.g. "-alpine" or "-debian"
+          FLAVOR_TAG="${{ matrix.flavor == 'alpine' && '-alpine' || '-debian' }}"
+
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          ARCH_TAG="${IMAGE}:${{ matrix.version }}${FLAVOR_TAG}-${{ matrix.arch }}"
+
+          echo "context_folder=$CTX" >> $GITHUB_OUTPUT
+          echo "flavor_tag=$FLAVOR_TAG" >> $GITHUB_OUTPUT
+          echo "arch_tag=$ARCH_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build & push (per-arch)
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.UPSTREAM_REPO }}#${{ env.UPSTREAM_REF }}:${{ steps.x.outputs.context_folder }}
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ steps.x.outputs.arch_tag }}
+
+  manifest:
+    runs-on: ubuntu-24.04
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ fromJSON(env.VERSIONS_JSON) }}
+        flavor: ${{ fromJSON(env.FLAVORS_JSON) }}
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compute tags
+        id: y
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          FLAVOR_TAG="${{ matrix.flavor == 'alpine' && '-alpine' || '-debian' }}"
+          BASE="${IMAGE}:${{ matrix.version }}${FLAVOR_TAG}"
+
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "amd64=${BASE}-amd64" >> $GITHUB_OUTPUT
+          echo "arm64=${BASE}-arm64" >> $GITHUB_OUTPUT
+
+      - name: Create & push multi-arch manifest
+        run: |
+          docker buildx imagetools create \
+            -t "${{ steps.y.outputs.base }}" \
+            "${{ steps.y.outputs.amd64 }}" \
+            "${{ steps.y.outputs.arm64 }}"
+
+      - name: Inspect manifest
+        run: docker buildx imagetools inspect "${{ steps.y.outputs.base }}"
